@@ -1,0 +1,221 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>weixin-dns-maven</groupId>
+  <artifactId>weixin-dns-maven</artifactId>
+ <version>0.0.1-SNAPSHOT</version> 
+  <packaging>war</packaging>
+  
+  <dependencies>
+  <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+     <version>4.11</version>
+    </dependency>
+		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+<!--SpringMvc 对象转json所需jar包  -->
+		<dependency>  
+            <groupId>com.fasterxml.jackson.core</groupId>  
+            <artifactId>jackson-core</artifactId>  
+            <version>2.1.0</version>  
+        </dependency>  
+        <dependency>  
+            <groupId>com.fasterxml.jackson.core</groupId>  
+            <artifactId>jackson-databind</artifactId>  
+            <version>2.1.0</version>  
+        </dependency>  
+        <dependency>  
+            <groupId>com.fasterxml.jackson.core</groupId>  
+            <artifactId>jackson-annotations</artifactId>  
+            <version>2.1.0</version>  
+        </dependency> 
+    
+    <!-- mysql -->
+    <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>5.1.17</version>
+	</dependency>
+    
+    
+ <!--    lo4j -->
+ 
+	 <dependency>
+	    <groupId>log4j</groupId>
+	    <artifactId>log4j</artifactId>
+	    <version>1.2.12</version>
+	</dependency>
+
+<!--      <dependency>
+    <groupId>aopalliance</groupId>
+    <artifactId>aopalliance</artifactId>
+    <version>1.0</version>
+	</dependency>
+ -->
+   <dependency>
+    <groupId>aspectj</groupId>
+    <artifactId>aspectjweaver</artifactId>
+    <version>1.5.3</version>
+	</dependency>
+	
+	
+	<!-- spring -->
+	<dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>4.2.2.RELEASE</version>
+        
+    </dependency>
+    
+    <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-orm</artifactId>
+    <version>4.2.2.RELEASE</version>
+	</dependency>
+	
+	
+	<!-- 包含了对定时任务的支持 -->
+	<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context-support</artifactId>
+    <version>4.2.2.RELEASE</version>
+</dependency>
+
+
+    
+   
+   <!--  springmvc -->
+    
+    <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>4.2.2.RELEASE</version>
+	</dependency>
+    
+    <!-- hibernate -->
+    <dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-c3p0</artifactId>
+    <version>4.2.21.Final</version>
+	</dependency>
+    
+     <!-- jsoup -->
+    <dependency>
+    <groupId>org.jsoup</groupId>
+    <artifactId>jsoup</artifactId>
+    <version>1.6.0</version>
+	</dependency>
+    <!-- hmlunit -->
+    <dependency>
+    <groupId>net.sourceforge.htmlunit</groupId>
+    <artifactId>htmlunit</artifactId>
+    <version>2.13</version>
+	</dependency>
+    
+    
+    <!-- json转对象 必须指定jdk版本，否则报错-->
+<dependency>
+    <groupId>net.sf.json-lib</groupId>
+    <artifactId>json-lib</artifactId>
+    <version>2.4</version>
+     <classifier>jdk15</classifier>
+</dependency>
+
+
+<dependency>
+    <groupId>org.quartz-scheduler</groupId>
+    <artifactId>quartz</artifactId>
+    <version>2.2.1</version>
+   
+</dependency>
+
+
+<!-- selenium -->
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>2.53.0</version>
+</dependency>
+
+    <dependency>
+    <groupId>com.github.detro.ghostdriver</groupId>
+    <artifactId>phantomjsdriver</artifactId>
+    <version>1.1.0</version>
+</dependency>  
+        
+  </dependencies>
+  
+  
+  
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>config</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+        <!-- 解决中文乱码 ,maven默认是GBK-->
+       	 <encoding>UTF-8</encoding>
+       	 <compilerArguments>
+                   		<extdirs>WebContent\WEB-INF\lib</extdirs>
+         </compilerArguments>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      
+      	 <plugin>
+				
+				<artifactId>maven-resources-plugin</artifactId>
+				
+				<!-- 解决中文乱码 ,maven默认是GBK-->
+				<configuration>
+					<encoding>UTF-8</encoding>
+					
+				</configuration>
+			</plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <warSourceDirectory>WebContent</warSourceDirectory>
+          <failOnMissingWebXml>true</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+      
+      
+      
+      <!--  添加jetty支持,Jetty 8 必须 Jdk 1.6+，Servlet 3.0，类似于 Tomcat 7-->
+		<plugin>
+		  <groupId>org.mortbay.jetty</groupId>
+		  <artifactId>jetty-maven-plugin</artifactId>
+		  <version>8.1.16.v20140903</version>
+		  <configuration>
+			<webAppSourceDirectory>${basedir}/WebContent</webAppSourceDirectory>
+		  </configuration>
+		</plugin>
+			
+    </plugins>
+  </build>
+</project>

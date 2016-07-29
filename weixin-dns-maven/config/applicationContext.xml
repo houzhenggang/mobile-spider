@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:task="http://www.springframework.org/schema/task"  
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+    http://www.springframework.org/schema/task  http://www.springframework.org/schema/task/spring-task-3.1.xsd " >
+
+	<!-- 配置自动扫描的包 use-default-filters 会自动注册@Component扫描（即@Service等都是它的子类），如果use-default-filters="false" 那么你需要自己指定扫描哪些-->
+	<context:component-scan base-package="com.jikexueyuancrm"
+		use-default-filters="true">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+
+	<!-- 配置数据源 -->
+	<context:property-placeholder location="classpath:db.properties" />
+
+	<!-- 配置DataSource -->
+	<bean class="com.mchange.v2.c3p0.ComboPooledDataSource" id="dataSource">
+		<property name="user" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.passowrd}"></property>
+		<property name="driverClass" value="${jdbc.driverClass}"></property>
+		<property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+	</bean>
+
+	<!-- 配置SessionFactory -->
+	<bean class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		id="sessionFactory" >
+		<!-- 配置数据源 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 扫描的实体包(pojo) -->
+		<property name="namingStrategy">
+			<bean class="org.hibernate.cfg.ImprovedNamingStrategy"></bean>
+		</property>
+		<property name="packagesToScan" value="com.jikexueyuancrm.entity"></property>
+
+		<!-- 配置Hibernate 的常用属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- 数据库的方言 -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 配置Hibernate 的事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+      <property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	
+	<!-- 事务增强 -->
+	
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">  
+  
+        <tx:attributes>  
+  
+            <!--  name 为方法名   -->
+  
+            <tx:method name="*" propagation="REQUIRED" read-only="false" />  
+  
+        </tx:attributes>  
+  
+    </tx:advice>  
+	
+	<!-- proxy-target-class="true" 代表CGLIB类代理-->
+	
+	<aop:config  proxy-target-class="false" >
+        <aop:pointcut id="pointcut" expression="execution(* com.jikexueyuancrm.service.impl.*.*(..))" />  
+  
+        <aop:advisor pointcut-ref="pointcut"  advice-ref="txAdvice" />  
+  
+    </aop:config>  
+  
+
+	
+	
+	
+	
+	
+	
+	
+  
+      
+      
+       <!-- 需要定时执行的类 -->
+      
+        <bean id="linkConsumeController" class="com.jikexueyuancrm.controller.LinkConsumeController"/>
+     
+        
+        
+        
+        
+        
+        <!-- 配置job,类中每个方法对应一个job  -->
+        
+        <bean id="consumeJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	        <property name="targetObject"  ref ="linkConsumeController"/>
+	            
+	        <property name="targetMethod"   value="consume" /> <!--要执行的方法名称 -->
+			      <!--禁止并发   -->
+			 <!-- 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 --> 
+	        <property name="concurrent" value="false  "/> 
+    	</bean>
+ 
+  
+        
+        
+        <!-- 每个job需要单独配置任务的定时执行(触发器)   CronTriggerFactoryBean或者SimpleTriggerFactoryBean -->
+    <bean id="consumeTimer" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="consumeJob"></property>   <!--对应job -->
+        <property name="cronExpression" value="0/5 * * * * ?"></property>
+    </bean>
+ 
+    
+    
+    
+    <!-- 最终的启动工厂   list里面配置多个定时触发器-->
+    <bean id="SpringJobSchedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="consumeTimer"/>
+            </list>
+        </property>
+    </bean>
+	
+	
+	
+	
+	<!-- 定时任务注解开启 -->
+	
+    <task:annotation-driven/>  
+	
+	
+	<bean id="hibernateTemplate"
+        class="org.springframework.orm.hibernate4.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+	
+</beans>
